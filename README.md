@@ -1,2 +1,2 @@
 TODO:
-	- hash password
+	- 	~~hash password~~

@@ -8,9 +8,12 @@ edition = "2018"
 [dependencies]
 actix-web = "*"
 actix-rt = "*"
+bcrypt = "*"
 clap = "*"
 chrono = { version = "0.4.10", features = ["serde"] }
+data-encoding = "*"
 diesel = { version = "1.4.4", features = ["mysql", "chrono", "r2d2"] }
 r2d2 = "*"
+ring = "*"
 serde = "*"
 serde_json = "*"

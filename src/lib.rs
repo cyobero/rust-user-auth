@@ -9,6 +9,7 @@ pub mod schema;
 pub mod db {
     use super::models::*;
 
+    use bcrypt::{hash, verify, DEFAULT_COST};
     use diesel::mysql::MysqlConnection;
     use diesel::prelude::*;
     use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
@@ -47,9 +48,14 @@ pub mod db {
     pub fn create_user(conn: &MysqlConnection, new_user: &NewUser) -> Result<usize, QueryError> {
         use super::schema::users;
 
-        diesel::insert_into(users::table)
-            .values(new_user)
-            .execute(conn)
+        // Hash password.
+        let hashed = hash(new_user.password, DEFAULT_COST);
+        let user = NewUser {
+            username: new_user.username,
+            password: &hashed.unwrap(),
+        };
+
+        diesel::insert_into(users::table).values(user).execute(conn)
     }
 
     /// Delete user by id.
@@ -66,11 +72,27 @@ pub mod db {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
         #[test]
+        fn password_hashed() {
+            use super::{create_user, establish_connection, get_user_by_username};
+            use bcrypt::{hash, verify, DEFAULT_COST};
+            let new_user = NewUser {
+                username: "testuser1",
+                password: "password123",
+            };
+            let hashed = hash(new_user.password, DEFAULT_COST);
+            let conn = establish_connection();
+            let _ = create_user(&conn, &new_user);
+            let usr = get_user_by_username(&conn, "testuser1".to_string()).unwrap();
+            let should_succeed = verify(usr.password, &hashed.unwrap());
+            assert!(should_succeed.is_ok());
+        }
+
+        #[test]
         fn user_retrieved_by_username() {
             use super::{establish_connection, get_user_by_username};
             let conn = establish_connection();
-            let usr = get_user_by_username(&conn, "cyobero".to_string()).unwrap();
-            assert_eq!(usr.username, "cyobero");
+            let usr = get_user_by_username(&conn, "thrillho".to_string()).unwrap();
+            assert_eq!(usr.username, "thrillho");
         }
 
         #[test]
@@ -93,13 +115,11 @@ pub mod db {
         fn user_retrieved_by_id() {
             use super::get_user_by_id;
             let conn = establish_connection();
-            let user = get_user_by_id(&conn, 1).unwrap();
-            let cyobero = get_user_by_id(&conn, 8).unwrap();
-            let marky = get_user_by_id(&conn, 7).unwrap();
+            let user = get_user_by_id(&conn, 34).unwrap();
+            let cyobero = get_user_by_id(&conn, 35).unwrap();
 
-            assert_eq!(user.id, 1);
-            assert_eq!(cyobero.id, 8);
-            assert_eq!(marky.username, "marky312");
+            assert_eq!(user.id, 34);
+            assert_eq!(cyobero.id, 35);
         }
         #[test]
         fn user_created() {
