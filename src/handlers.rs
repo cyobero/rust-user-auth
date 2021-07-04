@@ -125,3 +125,11 @@ pub async fn index() -> Result<HttpResponse, Error> {
         .content_type("text/html; charset=utf-8")
         .body(include_str!("../templates/index.html")))
 }
+
+/// Handler for signup page.
+#[get("/signup")]
+pub async fn signup() -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/signup.html")))
+}
