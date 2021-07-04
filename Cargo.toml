@@ -9,6 +9,7 @@ edition = "2018"
 actix-web = "*"
 actix-files = "*"
 actix-rt = "*"
+actix-session = "*"
 bcrypt = "*"
 clap = "*"
 chrono = { version = "0.4.10", features = ["serde"] }

@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate diesel;
 
+use actix_session::CookieSession;
 use actix_web::{get, App, HttpServer};
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
@@ -21,6 +22,7 @@ pub async fn main() -> std::io::Result<()> {
     // Start HTTP server.
     HttpServer::new(move || {
         App::new()
+            .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .data(pool.clone())
             .service(handlers::get_users)
             .service(handlers::get_users_id)
