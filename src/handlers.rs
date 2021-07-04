@@ -1,4 +1,5 @@
-use actix_web::{delete, get, post, web, Error, HttpResponse};
+use actix_files as fs;
+use actix_web::{delete, get, http::StatusCode, post, web, Error, HttpRequest, HttpResponse};
 use chrono::NaiveDateTime;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
@@ -55,7 +56,6 @@ pub async fn get_users_id(
 pub async fn get_users(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("Could not establish db pool connection.");
     use super::db::get_users;
-
     let res = web::block(move || get_users(&conn)).await.map_err(|e| {
         eprintln!("{}", e);
         HttpResponse::InternalServerError().finish()
@@ -116,4 +116,12 @@ pub async fn delete_users_id(
         })?;
 
     Ok(HttpResponse::Ok().body(format!("User ID {} deleted.", &id)))
+}
+
+/// Handler request that just serves up an index page.
+#[get("/")]
+pub async fn index() -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/index.html")))
 }

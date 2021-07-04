@@ -26,6 +26,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::get_users_id)
             .service(handlers::post_users)
             .service(handlers::delete_users_id)
+            .service(handlers::index)
     })
     .bind("0.0.0.0:8080")?
     .run()
