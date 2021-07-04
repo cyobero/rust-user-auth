@@ -1,10 +1,10 @@
-use actix_files as fs;
-use actix_web::{delete, get, http::StatusCode, post, web, Error, HttpRequest, HttpResponse};
+use actix_web::{delete, get, http::StatusCode, post, web, Error, HttpResponse};
 use chrono::NaiveDateTime;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
 use serde::{Deserialize, Serialize};
 
+use super::db;
 use super::models::*;
 
 type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
@@ -132,4 +132,31 @@ pub async fn signup() -> Result<HttpResponse, Error> {
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(include_str!("../templates/signup.html")))
+}
+
+#[post("/signup")]
+pub async fn signup_form(
+    pool: web::Data<DbPool>,
+    form: web::Form<NewUserInput>,
+) -> Result<HttpResponse, Error> {
+    let conn = pool.get().expect("Could not establish db pool connection.");
+
+    let _ = web::block(move || {
+        db::create_user(
+            &conn,
+            &NewUser {
+                username: &form.username,
+                password: &form.password,
+            },
+        )
+    })
+    .await
+    .map_err(|e| {
+        eprintln!("{}", e);
+        HttpResponse::InternalServerError().body("whoops! something went wrong.")
+    })?;
+
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/login_success.html")))
 }

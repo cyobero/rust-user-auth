@@ -153,7 +153,6 @@ pub mod db {
         #[test]
         fn connection_established() {
             use super::establish_connection;
-
             let conn = establish_connection();
         }
     }
