@@ -45,7 +45,9 @@ pub async fn get_users_id(
         .await
         .map_err(|e| {
             eprintln!("{}", e);
-            HttpResponse::InternalServerError().finish()
+            HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
+                .content_type("text/html; charset=utf-8")
+                .body(format!("{}", e))
         })?;
 
     Ok(HttpResponse::Ok().json(UserResponse {
