@@ -29,6 +29,8 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::index)
             .service(handlers::signup)
             .service(handlers::signup_form)
+            .service(handlers::login)
+            .service(handlers::login_form)
     })
     .bind("0.0.0.0:8080")?
     .run()

@@ -1,4 +1,8 @@
-use actix_web::{delete, get, http::StatusCode, post, web, Error, HttpResponse};
+use actix_web::{
+    delete, get,
+    http::{Method, StatusCode},
+    post, web, Error, HttpResponse,
+};
 use chrono::NaiveDateTime;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
@@ -159,4 +163,43 @@ pub async fn signup_form(
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(include_str!("../templates/login_success.html")))
+}
+
+/// Handler for login page.
+#[post("/login")]
+pub async fn login_form(
+    pool: web::Data<DbPool>,
+    _req: web::HttpRequest,
+    form: web::Form<NewUserInput>,
+) -> Result<HttpResponse, Error> {
+    use super::db::get_user_by_username;
+
+    let conn = pool
+        .get()
+        .expect("Could not establish connection to db pool.");
+
+    let qr = web::block(move || get_user_by_username(&conn, form.username.clone()))
+        .await
+        .map_err(|e| {
+            eprintln!("{}", e);
+            HttpResponse::InternalServerError()
+                .content_type("text/html")
+                .body("<h2>Error</h2>")
+        });
+
+    let res: Result<HttpResponse, Error> = match qr {
+        Ok(_) => Ok(HttpResponse::build(StatusCode::OK)
+            .content_type("text/html; charset=utf-8")
+            .body(include_str!("../templates/login_success.html"))),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Invalid credentials?")),
+    };
+    res
+}
+
+/// Handler for login page.
+#[get("/login")]
+pub async fn login(_req: web::HttpRequest) -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/login.html")))
 }
