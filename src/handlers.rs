@@ -24,8 +24,7 @@ pub struct UsersResponse {
 #[derive(Deserialize)]
 pub struct NewUserInput {
     username: String,
-    password1: String,
-    password2: String,
+    password: String,
 }
 
 /// Handler for GET /posts/{id}
@@ -94,7 +93,7 @@ pub async fn post_users<'a>(
     use super::db::create_user;
 
     let username = new_user.username.to_string();
-    let password = new_user.password1.to_string();
+    let password = new_user.password.to_string();
 
     let conn = pool.get().expect("Could not establish db pool connection.");
     let res = web::block(move || {
@@ -167,7 +166,7 @@ pub async fn signup_form(
             &conn,
             &NewUser {
                 username: &form.username,
-                password: &form.password1,
+                password: &form.password,
             },
         )
     })

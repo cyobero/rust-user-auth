@@ -19,7 +19,6 @@ pub async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
-    println!("Listening on localhost:8080");
     // Start HTTP server.
     HttpServer::new(move || {
         App::new()

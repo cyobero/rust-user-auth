@@ -1,0 +1,18 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'user_auth'
+      MYSQL_USER: 'headbang'
+      MYSQL_PASSWORD: 'password123'
+      MYSQL_ROOT_PASSWORD: 'passowrd123'
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql:/var/lib/mysql
+
+volumes:
+  mysql: 
