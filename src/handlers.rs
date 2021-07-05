@@ -61,7 +61,7 @@ pub async fn get_users(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     use super::db::get_users;
     let res = web::block(move || get_users(&conn)).await.map_err(|e| {
         eprintln!("{}", e);
-        HttpResponse::InternalServerError().finish()
+        HttpResponse::InternalServerError().body(format!("{}", e))
     })?;
 
     Ok(HttpResponse::Ok().json(UsersResponse { users: res }))
