@@ -27,6 +27,14 @@ mod tests {
     use crate::models::NewPost;
 
     #[test]
+    fn retrieved_posts_from_lisa() {
+        use super::get_posts_by_user_id;
+        let conn = establish_connection();
+        let posts = get_posts_by_user_id(&conn, 59).unwrap();
+        assert_eq!(posts[0].author_id, 59);
+    }
+
+    #[test]
     fn post_retreived_by_id() {
         use super::get_post_by_id;
         let conn = establish_connection();
