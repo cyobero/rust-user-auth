@@ -14,6 +14,13 @@ pub fn get_post_by_id(conn: &MysqlConnection, post_id: i32) -> Result<Post, Erro
     posts::table.filter(posts::id.eq(post_id)).get_result(conn)
 }
 
+/// Retreive all posts from user with user id.
+pub fn get_posts_by_user_id(conn: &MysqlConnection, author_id: i32) -> Result<Vec<Post>, Error> {
+    posts::table
+        .filter(posts::author_id.eq(author_id))
+        .get_results(conn)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::db::establish_connection;
