@@ -1,0 +1,11 @@
+-- Your SQL goes here
+CREATE TABLE posts (
+	id INT NOT NULL AUTO_INCREMENT,
+	title VARCHAR(255) NOT NULL,
+	body TEXT,
+	published BOOLEAN DEFAULT FALSE,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	author_id INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE CASCADE
+);
