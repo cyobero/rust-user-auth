@@ -173,7 +173,7 @@ pub async fn signup_form(
     .await
     .map_err(|e| {
         eprintln!("{}", e);
-        HttpResponse::InternalServerError().body("whoops! something went wrong.")
+        HttpResponse::InternalServerError().body(format!("{}", e))
     })?;
 
     Ok(HttpResponse::build(StatusCode::OK)
