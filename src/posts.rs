@@ -1,18 +1,31 @@
-use super::models::NewPost;
+use super::models::{NewPost, Post};
 use super::schema::posts;
-use diesel::prelude::*;
-use diesel::{mysql::MysqlConnection, result::Error};
+use diesel::{mysql::MysqlConnection, result::Error, ExpressionMethods, QueryDsl, RunQueryDsl};
 
+/// Create new post.
 pub fn create_post(conn: &MysqlConnection, new_post: NewPost) -> Result<usize, Error> {
     diesel::insert_into(posts::table)
         .values(&new_post)
         .execute(conn)
 }
 
+/// Get post by post ID.
+pub fn get_post_by_id(conn: &MysqlConnection, post_id: i32) -> Result<Post, Error> {
+    posts::table.filter(posts::id.eq(post_id)).get_result(conn)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::db::establish_connection;
     use crate::models::NewPost;
+
+    #[test]
+    fn post_retreived_by_id() {
+        use super::get_post_by_id;
+        let conn = establish_connection();
+        let res = get_post_by_id(&conn, 1);
+        assert_eq!(res.unwrap().id, 1);
+    }
 
     #[test]
     fn post_created() {
@@ -25,6 +38,9 @@ mod tests {
             author_id: 57,
         };
         let res = create_post(&conn, new_post);
-        assert_eq!(res, Ok(1));
+        match res {
+            Ok(_) => assert!(false, "Should not succeed."),
+            Err(e) => assert!(true, "{}", e),
+        };
     }
 }

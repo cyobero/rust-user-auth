@@ -22,8 +22,8 @@ pub struct NewUser<'a> {
 pub struct Post {
     pub id: i32,
     pub title: String,
-    pub body: String,
-    pub published: bool,
+    pub body: Option<String>,
+    pub published: Option<bool>,
     pub created_at: NaiveDateTime,
     pub author_id: i32,
 }
