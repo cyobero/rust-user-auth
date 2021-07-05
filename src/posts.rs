@@ -21,6 +21,11 @@ pub fn get_posts_by_user_id(conn: &MysqlConnection, author_id: i32) -> Result<Ve
         .get_results(conn)
 }
 
+/// Retrieves all posts.
+pub fn get_posts(conn: &MysqlConnection) -> Result<Vec<Post>, Error> {
+    posts::table.get_results(conn)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::db::establish_connection;

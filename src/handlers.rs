@@ -31,6 +31,24 @@ pub struct NewUserInput {
     password: String,
 }
 
+/// Handler for GET /posts/{id}
+#[get("/posts/{id}")]
+pub async fn get_posts_id(
+    pool: web::Data<DbPool>,
+    post_id: web::Path<i32>,
+) -> Result<HttpResponse, Error> {
+    use super::posts::get_post_by_id;
+    let conn = pool.get().expect("Could not establish db pool connection.");
+    let post = web::block(move || get_post_by_id(&conn, post_id.into_inner()))
+        .await
+        .map_err(|e| {
+            eprintln!("{}", e);
+            HttpResponse::InternalServerError().body("Could not retrieve post.")
+        })?;
+
+    Ok(HttpResponse::Ok().json(post))
+}
+
 /// Handler for GET /users/{id}
 #[get("/users/{id}")]
 pub async fn get_users_id(
