@@ -7,3 +7,4 @@ TODO:
 	-   `GET /users` response should not include password.`
 	-   If `GET /user/{id}` can't find user then it should return an error http response.~~
 	-   process/clean forms before interacting with db.
+	- 	create handler for `GET /posts/{author_id}``

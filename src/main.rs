@@ -19,6 +19,7 @@ pub async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
+    println!("Listening on localhost:8080");
     // Start HTTP server.
     HttpServer::new(move || {
         App::new()
@@ -33,6 +34,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::signup_form)
             .service(handlers::login)
             .service(handlers::login_form)
+            .service(handlers::get_posts_id)
     })
     .bind("0.0.0.0:8080")?
     .run()
