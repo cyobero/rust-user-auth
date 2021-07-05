@@ -9,7 +9,7 @@ pub mod schema;
 pub mod db {
     use super::models::*;
 
-    use bcrypt::{hash, verify, DEFAULT_COST};
+    use bcrypt::{hash, DEFAULT_COST};
     use diesel::mysql::MysqlConnection;
     use diesel::prelude::*;
     use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
