@@ -7,5 +7,5 @@ TODO:
 	-   `GET /users` response should not include password.`
 	-   If `GET /user/{id}` can't find user then it should return an error http response.~~
 	-   process/clean forms before interacting with db.
-	- 	create handler for `GET /posts/{author_id}``
-	-   sign up page leads to ParseError
+	- 	~~create handler for `GET /posts/{author_id}~~
+	-   ~~FIXED: sign up page leads to ParseError~~
