@@ -10,3 +10,4 @@ TODO:
 	-   	- middleware?
 	- 	~~create handler for `GET /posts/{author_id}~~
 	-   ~~FIXED: sign up page leads to ParseError~~
+	-   Create form for writing a new post.

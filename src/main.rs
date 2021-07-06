@@ -34,6 +34,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::login)
             .service(handlers::login_form)
             .service(handlers::get_posts_id)
+            .service(handlers::get_posts_new)
     })
     .bind("0.0.0.0:8080")?
     .run()

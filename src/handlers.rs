@@ -39,7 +39,7 @@ pub struct UsersResponse {
 }
 
 /// Handler for GET /posts/{id}
-#[get("/posts/{id}")]
+#[get("/posts/{id: i32}")]
 pub async fn get_posts_id(
     pool: web::Data<DbPool>,
     post_id: web::Path<i32>,
@@ -243,4 +243,12 @@ pub async fn login(_req: web::HttpRequest) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
         .body(include_str!("../templates/login.html")))
+}
+
+/// Handler for create post page.
+#[get("/posts/new")]
+pub async fn get_posts_new() -> Result<HttpResponse, Error> {
+    Ok(HttpResponse::build(StatusCode::OK)
+        .content_type("text/html; charset=utf-8")
+        .body(include_str!("../templates/new_post.html")))
 }
