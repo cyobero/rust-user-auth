@@ -26,6 +26,9 @@ pub async fn main() -> std::io::Result<()> {
     handlebars
         .register_template_string("index", include_str!("../templates/index.html"))
         .unwrap();
+    handlebars
+        .register_template_string("login", "../templates/login.html")
+        .unwrap();
 
     let hb_ref = web::Data::new(handlebars);
 
@@ -48,7 +51,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::get_posts_id)
             .service(handlers::get_posts_new)
     })
-    .bind("0.0.0.0:8080")?
+    .bind("0.0.0.0:8081")?
     .run()
     .await
 }

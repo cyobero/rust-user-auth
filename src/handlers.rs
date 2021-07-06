@@ -61,7 +61,7 @@ pub trait Validate {
 }
 
 /// Handler for GET /posts/{id}
-#[get("/posts/{id: i32}")]
+#[get("posts/{id: i32}")]
 pub async fn get_posts_id(
     pool: web::Data<DbPool>,
     post_id: web::Path<i32>,
@@ -79,7 +79,7 @@ pub async fn get_posts_id(
 }
 
 /// Handler for GET /users/{id}
-#[get("/users/{id: i32}")]
+#[get("/users/{id}")]
 pub async fn get_users_id(
     pool: web::Data<DbPool>,
     _id: web::Path<i32>,
@@ -260,7 +260,7 @@ pub async fn login_form(
 }
 
 /// Handler for login page.
-#[get("/")]
+#[get("/login")]
 pub async fn login(_req: web::HttpRequest) -> Result<HttpResponse, Error> {
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
@@ -268,7 +268,7 @@ pub async fn login(_req: web::HttpRequest) -> Result<HttpResponse, Error> {
 }
 
 /// Handler for create post page.
-#[get("/posts/new")]
+#[get("posts/new_post.html")]
 pub async fn get_posts_new() -> Result<HttpResponse, Error> {
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
@@ -276,7 +276,7 @@ pub async fn get_posts_new() -> Result<HttpResponse, Error> {
 }
 
 /// Handler for `POST /posts/new`
-#[post("/posts/new")]
+#[post("/posts")]
 pub async fn post_posts_new(
     pool: web::Data<DbPool>,
     form: web::Form<NewPostInput>,
