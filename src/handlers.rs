@@ -4,7 +4,9 @@ use actix_web::{
 use chrono::NaiveDateTime;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
+use handlebars::Handlebars;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 use super::db::*;
 use super::models::*;
@@ -171,10 +173,18 @@ pub async fn delete_users_id(
 
 /// Handler request that just serves up an index page.
 #[get("/")]
-pub async fn index() -> Result<HttpResponse, Error> {
+pub async fn index(
+    req: web::HttpRequest,
+    hb: web::Data<Handlebars<'_>>,
+) -> Result<HttpResponse, Error> {
+    let data = json!({
+        "foo": "bar",
+        "req": format!("{:?}", req)
+    });
+    let body = hb.render("index", &data).unwrap();
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
-        .body(include_str!("../templates/index.html")))
+        .body(body))
 }
 
 /// Handler for signup page.

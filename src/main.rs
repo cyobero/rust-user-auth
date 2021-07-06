@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate diesel;
+extern crate serde_json;
 
 use actix_cors::Cors;
 use actix_session::CookieSession;
@@ -7,6 +8,7 @@ use actix_web::{get, web, App, HttpServer};
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
+use handlebars::Handlebars;
 
 use std::env;
 
@@ -20,11 +22,19 @@ pub async fn main() -> std::io::Result<()> {
         .build(manager)
         .expect("Failed to create pool.");
 
+    let mut handlebars = Handlebars::new();
+    handlebars
+        .register_template_string("index", include_str!("../templates/index.html"))
+        .unwrap();
+
+    let hb_ref = web::Data::new(handlebars);
+
     // Start HTTP server.
     HttpServer::new(move || {
         App::new()
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .data(pool.clone())
+            .app_data(hb_ref.clone())
             .service(handlers::get_users)
             .service(handlers::get_users_id)
             .service(handlers::post_users)
