@@ -11,4 +11,4 @@ TODO:
 	- 	~~create handler for `GET /posts/{author_id}~~
 	-   ~~FIXED: sign up page leads to ParseError~~
 	-	~~Create form for writing a new post.~~
-	-	Add templating system   
+	-	Add templating system.  
