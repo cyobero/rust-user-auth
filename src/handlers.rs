@@ -77,7 +77,7 @@ pub async fn get_posts_id(
 }
 
 /// Handler for GET /users/{id}
-#[get("/users/{id}")]
+#[get("/users/{id: i32}")]
 pub async fn get_users_id(
     pool: web::Data<DbPool>,
     _id: web::Path<i32>,
