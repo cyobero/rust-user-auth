@@ -16,15 +16,26 @@ pub struct UserResponse {
     created_at: NaiveDateTime,
 }
 
-#[derive(Serialize)]
-pub struct UsersResponse {
-    users: Vec<User>,
+impl UserResponse {
+    /// Creates a new `UserResponse` from a `User` struct.
+    pub fn from_user(user: User) -> Self {
+        UserResponse {
+            id: user.id,
+            username: user.username,
+            created_at: user.created_at,
+        }
+    }
 }
 
 #[derive(Deserialize)]
 pub struct NewUserInput {
     username: String,
     password: String,
+}
+
+#[derive(Serialize)]
+pub struct UsersResponse {
+    user_resp: Vec<UserResponse>,
 }
 
 /// Handler for GET /posts/{id}
@@ -52,7 +63,6 @@ pub async fn get_users_id(
     _id: web::Path<i32>,
 ) -> Result<HttpResponse, Error> {
     use super::db::get_user_by_id;
-
     let user_id = _id.into_inner();
     let conn = pool.get().expect("Could not establish db pool connection.");
     let usr = web::block(move || get_user_by_id(&conn, user_id))
@@ -76,12 +86,18 @@ pub async fn get_users_id(
 pub async fn get_users(pool: web::Data<DbPool>) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("Could not establish db pool connection.");
     use super::db::get_users;
-    let res = web::block(move || get_users(&conn)).await.map_err(|e| {
-        eprintln!("{}", e);
-        HttpResponse::InternalServerError().body(format!("{}", e))
-    })?;
+    let users: Vec<UserResponse> = web::block(move || get_users(&conn))
+        .await
+        .map_err(|e| {
+            eprintln!("{}", e);
+            HttpResponse::InternalServerError().body(format!("{}", e))
+        })
+        .unwrap()
+        .into_iter()
+        .map(|usr| UserResponse::from_user(usr))
+        .collect();
 
-    Ok(HttpResponse::Ok().json(UsersResponse { users: res }))
+    Ok(HttpResponse::Ok().json(users))
 }
 
 /// Handler for POST /users
