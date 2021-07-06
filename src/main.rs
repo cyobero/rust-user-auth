@@ -1,8 +1,9 @@
 #[macro_use]
 extern crate diesel;
 
+use actix_cors::Cors;
 use actix_session::CookieSession;
-use actix_web::{get, App, HttpServer};
+use actix_web::{get, web, App, HttpServer};
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use diesel::r2d2::ConnectionManager;
@@ -23,6 +24,13 @@ pub async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
+            .wrap(
+                Cors::default()
+                    .allow_any_header()
+                    .allow_any_method()
+                    .allow_any_origin()
+                    .max_age(3600),
+            )
             .data(pool.clone())
             .service(handlers::get_users)
             .service(handlers::get_users_id)
