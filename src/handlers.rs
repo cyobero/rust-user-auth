@@ -194,22 +194,31 @@ pub async fn login_form(
         .get()
         .expect("Could not establish connection to db pool.");
 
-    let qr = web::block(move || get_user_by_username(&conn, form.username.clone()))
+    let password = form.password.clone();
+    let username = form.username.clone();
+    // See if username exists in db.
+    let user = web::block(move || get_user_by_username(&conn, username))
         .await
         .map_err(|e| {
             eprintln!("{}", e);
             HttpResponse::InternalServerError()
                 .content_type("text/html")
-                .body("<h2>Error</h2>")
+                .body("<h2>Invalid credentials.</h2>")
         });
 
-    let res: Result<HttpResponse, Error> = match qr {
-        Ok(_) => Ok(HttpResponse::build(StatusCode::OK)
-            .content_type("text/html; charset=utf-8")
-            .body(include_str!("../templates/login_success.html"))),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Invalid credentials?")),
-    };
-    res
+    match user {
+        // If user found
+        Ok(u) => {
+            if password == u.password {
+                // If passwords match.
+                Ok(HttpResponse::Ok().body("successfully logged in!"))
+            } else {
+                Ok(HttpResponse::Ok().body("Passwords did not match."))
+            }
+        }
+        // Username does not exist.
+        Err(_) => Ok(HttpResponse::InternalServerError().body("No such user exists.")),
+    }
 }
 
 /// Handler for login page.
