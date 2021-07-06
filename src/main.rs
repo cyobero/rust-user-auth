@@ -24,13 +24,6 @@ pub async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
-            .wrap(
-                Cors::default()
-                    .allow_any_header()
-                    .allow_any_method()
-                    .allow_any_origin()
-                    .max_age(3600),
-            )
             .data(pool.clone())
             .service(handlers::get_users)
             .service(handlers::get_users_id)
@@ -41,6 +34,7 @@ pub async fn main() -> std::io::Result<()> {
             .service(handlers::signup_form)
             .service(handlers::login)
             .service(handlers::login_form)
+            .service(handlers::get_posts)
             .service(handlers::get_posts_id)
             .service(handlers::get_posts_new)
     })
