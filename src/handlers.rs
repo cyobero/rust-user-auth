@@ -60,7 +60,7 @@ pub trait Validate {
 }
 
 /// Handler for GET /posts/{id}
-#[get("posts/{id: i32}")]
+#[get("posts/{id}")]
 pub async fn get_posts_id(
     pool: web::Data<DbPool>,
     post_id: web::Path<i32>,
@@ -199,6 +199,7 @@ pub async fn signup() -> Result<HttpResponse, Error> {
 #[post("/signup")]
 pub async fn signup_form(
     pool: web::Data<DbPool>,
+    hb: web::Data<Handlebars<'_>>,
     form: web::Form<NewUserInput>,
 ) -> Result<HttpResponse, Error> {
     let conn = pool.get().expect("Could not establish db pool connection.");
@@ -213,14 +214,11 @@ pub async fn signup_form(
         )
     })
     .await
-    .map_err(|e| {
-        eprintln!("{}", e);
-        HttpResponse::InternalServerError().body(format!("{}", e))
-    })?;
+    .map_err(|e| HttpResponse::InternalServerError().body(format!("{}", e)))?;
 
     Ok(HttpResponse::build(StatusCode::OK)
         .content_type("text/html; charset=utf-8")
-        .body(include_str!("../templates/login_success.html")))
+        .body(include_str!("../templates/signup_success.html")))
 }
 
 #[post("/login")]

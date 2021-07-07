@@ -1,5 +1,5 @@
 use super::db::get_user_by_username;
-use super::models::User;
+use super::models;
 use actix_session::Session;
 use actix_web::{web, HttpRequest};
 use bcrypt::{verify, BcryptError};
@@ -14,7 +14,7 @@ pub fn authenticate(
     conn: &MysqlConnection,
     username: &str,
     password: &str,
-) -> Result<User, String> {
+) -> Result<models::User, String> {
     let user = get_user_by_username(&conn, username.to_string()).expect("User not found.");
     if let Ok(true) = verify(password, &user.password) {
         Ok(user)
@@ -23,10 +23,34 @@ pub fn authenticate(
     }
 }
 
-pub fn login(req: HttpRequest, user: &User, sess: Session) -> Result<(), Error> {
-    sess.set("user", user);
-
+pub fn login<U: User>(conn: &MysqlConnection, user: &U) -> Result<(), Error> {
     unimplemented!()
+}
+
+pub trait User {
+    fn is_user() -> bool {
+        true
+    }
+}
+
+pub struct AnonymousUser {
+    pub username: Option<String>,
+    pub password: Option<String>,
+}
+
+impl AnonymousUser {
+    pub fn new() -> Self {
+        AnonymousUser::default()
+    }
+}
+
+impl Default for AnonymousUser {
+    fn default() -> Self {
+        AnonymousUser {
+            username: None,
+            password: None,
+        }
+    }
 }
 
 #[cfg(test)]

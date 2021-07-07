@@ -29,6 +29,9 @@ pub async fn main() -> std::io::Result<()> {
     handlebars
         .register_template_string("login", "../templates/login.html")
         .unwrap();
+    handlebars
+        .register_template_string("signup", "../templates/signup.html")
+        .unwrap();
 
     let hb_ref = web::Data::new(handlebars);
 

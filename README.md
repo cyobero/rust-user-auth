@@ -13,3 +13,6 @@ TODO:
 	-	~~Create form for writing a new post.~~
 	-	Add templating system.  
 	-	Add error messages to template rendering.
+	-	Validate signup form.
+	-	create table for user sessions
+	-		- include `login_time, logout_time, fk_user_id`
