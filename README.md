@@ -12,3 +12,4 @@ TODO:
 	-   ~~FIXED: sign up page leads to ParseError~~
 	-	~~Create form for writing a new post.~~
 	-	Add templating system.  
+	-	Add error messages to template rendering.

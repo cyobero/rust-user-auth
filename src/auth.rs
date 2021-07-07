@@ -16,15 +16,16 @@ pub fn authenticate(
     password: &str,
 ) -> Result<User, String> {
     let user = get_user_by_username(&conn, username.to_string()).expect("User not found.");
-    let valid = verify(password, &user.password).unwrap();
-    if valid {
+    if let Ok(true) = verify(password, &user.password) {
         Ok(user)
     } else {
-        Err("Wrong password.".to_string())
+        Err("Invalid Credentials. PLease try again.".to_string())
     }
 }
 
-pub fn login(req: HttpRequest, user: Option<User>, sess: Session) -> Result<(), Error> {
+pub fn login(req: HttpRequest, user: &User, sess: Session) -> Result<(), Error> {
+    sess.set("user", user);
+
     unimplemented!()
 }
 

@@ -1,6 +1,5 @@
-use actix_web::{
-    delete, get, http::StatusCode, post, web, web::Form, Error, HttpResponse, ResponseError,
-};
+use actix_session::Session;
+use actix_web::{delete, get, http::StatusCode, post, web, web::Form, Error, HttpResponse};
 use chrono::NaiveDateTime;
 use diesel::mysql::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
@@ -176,10 +175,12 @@ pub async fn delete_users_id(
 pub async fn index(
     req: web::HttpRequest,
     hb: web::Data<Handlebars<'_>>,
+    sess: Session,
 ) -> Result<HttpResponse, Error> {
     let data = json!({
         "foo": "bar",
-        "req": format!("{:?}", req)
+        "req": format!("{:?}", req),
+        "user": sess.get::<User>("user")?
     });
     let body = hb.render("index", &data).unwrap();
     Ok(HttpResponse::build(StatusCode::OK)
@@ -225,8 +226,8 @@ pub async fn signup_form(
 #[post("/login")]
 pub async fn login_form(
     pool: web::Data<DbPool>,
-    _req: web::HttpRequest,
     form: web::Form<NewUserInput>,
+    sess: Session,
 ) -> Result<HttpResponse, Error> {
     let conn = pool
         .get()
@@ -240,7 +241,7 @@ pub async fn login_form(
         .map_err(|e| {
             eprintln!("{}", e);
             HttpResponse::InternalServerError()
-                .content_type("text/html")
+                .content_type("text/html; charset=utf-8")
                 .body("<h2>Invalid credentials.</h2>")
         });
 
@@ -249,6 +250,7 @@ pub async fn login_form(
         Ok(u) => {
             if password == u.password {
                 // If passwords match.
+                sess.set("user", u)?;
                 Ok(HttpResponse::Ok().body("successfully logged in!"))
             } else {
                 Ok(HttpResponse::Ok().body("Passwords did not match."))
