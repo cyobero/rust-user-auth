@@ -1,4 +1,5 @@
 TODO:
+==============================================================================================
 	- 	~~hash password~~
 	- 	~~create `index.html` resource~~.
 	- 	create user login service.
@@ -14,5 +15,9 @@ TODO:
 	-	Add templating system.  
 	-	Add error messages to template rendering.
 	-	Validate signup form.
-	-	create table for user sessions
-	-		- include `login_time, logout_time, fk_user_id`
+	-	~~create table for user sessions
+	-		- include `login_time, logout_time, fk_user_id`~~
+	-	create user session after successful login and signup.
+	-	Refactor some code.
+	-	~~#ISSUE (FIXED): signup page does not return rendered page.
+	-		- returns "../templates/signup.html" instead.~~

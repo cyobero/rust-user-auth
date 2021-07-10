@@ -1,14 +1,16 @@
 //! Methods for interacting with the database.
 
-use super::models::*;
+use super::auth;
+use super::models;
 
 use bcrypt::{hash, DEFAULT_COST};
+use diesel::connection::Connection;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 use std::env;
 
-type QueryError = diesel::result::Error;
+type DieselError = diesel::result::Error;
 
 /// Establishes connection to db.
 pub fn establish_connection() -> MysqlConnection {
@@ -17,30 +19,36 @@ pub fn establish_connection() -> MysqlConnection {
 }
 
 /// Retreive all users.
-pub fn get_users(conn: &MysqlConnection) -> Result<Vec<User>, QueryError> {
+pub fn get_users(conn: &MysqlConnection) -> Result<Vec<models::User>, DieselError> {
     use super::schema::users;
     users::table.get_results(conn)
 }
 
 /// Get user by user id.
-pub fn get_user_by_id(conn: &MysqlConnection, user_id: i32) -> Result<User, QueryError> {
+pub fn get_user_by_id(conn: &MysqlConnection, user_id: i32) -> Result<models::User, DieselError> {
     use crate::schema::users::dsl::*;
     users.filter(id.eq(user_id)).get_result(conn)
 }
 
 /// Get user by username.
-pub fn get_user_by_username(conn: &MysqlConnection, _username: String) -> Result<User, QueryError> {
+pub fn get_user_by_username(
+    conn: &MysqlConnection,
+    _username: String,
+) -> Result<models::User, DieselError> {
     use crate::schema::users::dsl::*;
     users.filter(username.eq(_username)).get_result(conn)
 }
 
 /// Create new user.
-pub fn create_user(conn: &MysqlConnection, new_user: &NewUser) -> Result<usize, QueryError> {
+pub fn create_user(
+    conn: &MysqlConnection,
+    new_user: &models::NewUser,
+) -> Result<usize, DieselError> {
     use super::schema::users;
 
     // Hash password.
     let hashed = hash(new_user.password, DEFAULT_COST);
-    let user = NewUser {
+    let user = models::NewUser {
         username: new_user.username,
         password: &hashed.unwrap(),
     };
@@ -49,9 +57,23 @@ pub fn create_user(conn: &MysqlConnection, new_user: &NewUser) -> Result<usize, 
 }
 
 /// Delete user by id.
-pub fn delete_user(conn: &MysqlConnection, user_id: i32) -> Result<usize, QueryError> {
+pub fn delete_user(conn: &MysqlConnection, user_id: i32) -> Result<usize, DieselError> {
     use super::schema::users::dsl::*;
     diesel::delete(users.filter(id.eq(user_id))).execute(conn)
+}
+
+/// Creates a new session entry in database.
+pub fn create_session(
+    conn: &MysqlConnection,
+    _session_id: &str,
+    _user_id: i32,
+) -> Result<usize, DieselError> {
+    use super::schema::sessions::dsl::*;
+    let sess = models::NewSession {
+        session_id: _session_id,
+        user_id: _user_id,
+    };
+    diesel::insert_into(sessions).values(sess).execute(conn)
 }
 
 #[cfg(test)]
@@ -61,6 +83,13 @@ mod tests {
     use crate::schema::users;
     use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
+    #[test]
+    fn session_created() {
+        use super::create_session;
+        let conn = establish_connection();
+        let res = create_session(&conn, "sessid123", 58);
+        assert!(res.is_err());
+    }
     #[test]
     fn password_hashed() {
         use super::{create_user, establish_connection, get_user_by_username};

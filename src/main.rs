@@ -27,10 +27,10 @@ pub async fn main() -> std::io::Result<()> {
         .register_template_string("index", include_str!("../templates/index.html"))
         .unwrap();
     handlebars
-        .register_template_string("login", "../templates/login.html")
+        .register_template_string("login", include_str!("../templates/login.html"))
         .unwrap();
     handlebars
-        .register_template_string("signup", "../templates/signup.html")
+        .register_template_string("signup", include_str!("../templates/signup.html"))
         .unwrap();
 
     let hb_ref = web::Data::new(handlebars);

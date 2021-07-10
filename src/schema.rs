@@ -10,6 +10,14 @@ table! {
 }
 
 table! {
+    sessions (session_id, user_id) {
+        session_id -> Varchar,
+        user_id -> Integer,
+        login_time -> Timestamp,
+    }
+}
+
+table! {
     users (id) {
         id -> Integer,
         username -> Varchar,
@@ -19,8 +27,10 @@ table! {
 }
 
 joinable!(posts -> users (author_id));
+joinable!(sessions -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     posts,
+    sessions,
     users,
 );
